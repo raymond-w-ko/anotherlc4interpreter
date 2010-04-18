@@ -56,7 +56,7 @@ def parse_branch(instruc = "", word_buf = ""):
   ins = ins.lower()
   
   imm = ins_list[1]
-  imm = int(imm, 10)
+  imm = int(imm)
   if imm > (2^8) or imm < -(2^8) + 1:
     print "ERROR: Immediate value " + str(imm) +" is out of range."
     print "IMM in BR(nzp) IMM must be greater than -(2^8) + 1 and less than 2^8"
@@ -67,7 +67,7 @@ def parse_branch(instruc = "", word_buf = ""):
     imm = imm * -1
     sign = "1"
   
-  imm = int2bin(imm)
+  imm = int2bin(imm, 8)
   imm = sign + imm
   
   if ins == "brn":
@@ -107,6 +107,7 @@ def parse_alu(instruc = "", word_buf = ""):
       print "sanitized: element"
     if element == "":
       instruc.remove(element)
+  
   
   ins = instruc[0]
   regD = instruc[1]
@@ -564,6 +565,7 @@ def main():
   for line in file:
     binary = parse(line)
     if binary != "-1":
+      print binary
       B = int(binary[8:15],2)
       B = chr(B)
       A = int(binary[0:7],2)
