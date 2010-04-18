@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys
 from array import array
 
@@ -566,9 +567,11 @@ def main():
     binary = parse(line)
     if binary != "-1":
       print binary
-      B = int(binary[8:15],2)
+      B = int(binary[9:16],2)
+      print "***", binary[8:16]
       B = chr(B)
-      A = int(binary[0:7],2)
+      A = int(binary[0:8],2)
+      print "***", binary[0:8]
       A = chr(A)
       binary = array('c', [A,B])
       binary.tofile(output_file)
