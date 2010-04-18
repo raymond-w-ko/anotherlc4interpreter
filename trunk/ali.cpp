@@ -1,5 +1,5 @@
 ﻿#include "LC4Machine.h"
-#include "ncurses.h"
+#include <ncurses.h>
 
 int main(int argc, char* argv[])
 {
