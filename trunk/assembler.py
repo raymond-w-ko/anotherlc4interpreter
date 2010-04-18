@@ -55,7 +55,6 @@ def parse_branch(instruc = "", word_buf = ""):
   ins_list = instruc.split(" ")
   ins = ins_list[0]
   ins = ins.lower()
-  
   imm = ins_list[1]
   imm = int(imm)
   if imm > (2^8) or imm < -(2^8) + 1:
@@ -569,11 +568,9 @@ def main():
       print binary
       B = int(binary[9:16],2)
       print "***", binary[8:16]
-      B = chr(B)
       A = int(binary[0:8],2)
       print "***", binary[0:8]
-      A = chr(A)
-      binary = array('c', [A,B])
+      binary = array('H', [A,B])
       binary.tofile(output_file)
       #output_file.write("\n")
     else:

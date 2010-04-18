@@ -1,4 +1,4 @@
-﻿CFLAGS=-Wall -lcurses
+CFLAGS=-Wall -lcurses
 
 all: lc4
 
