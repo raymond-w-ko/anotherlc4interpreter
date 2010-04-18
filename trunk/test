@@ -1,0 +1,6 @@
+BRz 6
+BRnz -8
+BRp 4
+add r1,r3,r4
+add r1, r2, 5
+mul r7, r3, r3
