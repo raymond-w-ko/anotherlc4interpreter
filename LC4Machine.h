@@ -37,6 +37,11 @@ public:
     LC4::registers get_registers() { return LC4::registers(regs); }
 
     /**
+     * Returns the value at a specified memory address
+     */
+    unsigned short get_mem(unsigned short address) { return this->memory[address]; }
+
+    /**
      * Steps the LC4 Machine through one instruction
      * @return true if no errors have occurred, false 
      * if an error has occurred
