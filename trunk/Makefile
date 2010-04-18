@@ -1,4 +1,4 @@
-CFLAGS=-Wall -lcurses
+CFLAGS=-Wall -lncurses
 
 all: ali
 
