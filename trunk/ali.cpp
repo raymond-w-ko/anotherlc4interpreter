@@ -148,7 +148,6 @@ ALI::redraw()
     // print memory region
     // we have 5 lines to play with
     box(this->wMemory, 0, 0);
-    mvwprintw(this->wMemory, 1, 1, "0000: 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000");
 
     unsigned short loc = this->memory_location;
     for (int row = 1; row <= 5; row++) {
