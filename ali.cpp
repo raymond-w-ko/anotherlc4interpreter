@@ -100,12 +100,10 @@ ALI::parseCommand(char* str)
         this->memory_location = new_mem_loc;
     }
     else if (strcmp(str, "step") == 0 || strcmp(str, "s") == 0) {
+        this->commandLineMsg = "";
         bool b = this->lc4->step();
         if (!b) {
             this->commandLineMsg = "End of code reached. Please restart or exit.";
-        }
-        else {
-            this->commandLineMsg = "";
         }
     }
     else if (strcmp(str, "r") == 0 || strcmp(str, "restart") == 0) {
@@ -203,7 +201,8 @@ ALI::redraw()
     refresh();
 }
 
-int main(int argc, char* argv[])
+int
+ALI::begin(int argc, char* argv[])
 {
     if (argc <= 1 || argc > 3) {
         printf("%s [bin file] (optional source file)\n", argv[0]);
@@ -219,6 +218,7 @@ int main(int argc, char* argv[])
     try {
         LC4Machine lc4(bin_file);
         ALI ali(&lc4, src_file);
+        lc4.setManagedBy(&ali);
         ali.loop();
     }
     catch(const char* str) {
@@ -229,7 +229,6 @@ int main(int argc, char* argv[])
         std::cout << "Uncaught exception" << std::endl;
         return 255;
     }
-
 
     return 0;
 }
