@@ -9,8 +9,17 @@ class ALI
 {
 friend class LC4Machine;
 public:
-    ALI(LC4Machine* lc4, std::string src_filename);
+    ALI(std::string src_filename);
     ~ALI();
+
+    void setMachine(LC4Machine* lc4) { 
+        this->lc4 = lc4; 
+        refresh();
+        this->redraw();
+        refresh();
+        this->redraw();
+        refresh();
+    }
 
     static int begin(int argc, char* argv[]);
     void loop();
