@@ -14,8 +14,7 @@ LC4Machine::perform_load(unsigned short op)
     if (this->MEMCHECK) {
         unsigned char* test_ptr = (unsigned char*) &this->memory[addr];
         if (test_ptr + offset > (test_ptr + 0xFFFF + 1)) {
-            throw "Out of bound read error!";
-            return 0xDEAD;
+            return false;
         }
     }
 
@@ -23,7 +22,7 @@ LC4Machine::perform_load(unsigned short op)
     ptr += offset;
     this->regs.r[d] = *((unsigned short*) ptr);
 
-    return this->regs.r[d];
+    return true;
 }
 
 unsigned short
@@ -40,8 +39,7 @@ LC4Machine::perform_store(unsigned short op)
     if (this->MEMCHECK) {
         unsigned char* test_ptr = (unsigned char*) &this->memory[addr];
         if (test_ptr + offset > (test_ptr + 0xFFFF + 1)) {
-            throw "Out of bound read error!";
-            return 0xDEAD;
+            return false;
         }
     }
 
@@ -49,5 +47,5 @@ LC4Machine::perform_store(unsigned short op)
     ptr += offset;
     *((unsigned short*) ptr) = this->regs.r[d];
 
-    return this->regs.r[d];
+    return true;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "ali.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -23,6 +24,7 @@ namespace LC4
     };
 }
 
+class ALI;
 class LC4Machine
 {
 public:
@@ -64,8 +66,11 @@ public:
      */
     unsigned short SEXT(unsigned short n, unsigned int size);
         
+    void setManagedBy(ALI* ali) { this->ali = ali; }
 
 private:
+    ALI* ali;
+
     /** Filename that contains binary code */
     std::string filename;
 

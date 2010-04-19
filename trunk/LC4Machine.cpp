@@ -96,11 +96,21 @@ LC4Machine::step()
         break;
     case 6:
         // load
-        this->perform_load(insn);
+        {
+        bool b = this->perform_load(insn);
+        if (!b) {
+            this->ali->commandLineMsg = "Out of bound LOAD";
+        }
+        }
         break;
     case 7:
         // store
-        this->perform_store(insn);
+        {
+        bool b = this->perform_store(insn);
+        if (!b) {
+            this->ali->commandLineMsg = "Out of bound STORE";
+        }
+        }
         break;
     case 8:
         // RTI

@@ -1,7 +1,7 @@
-﻿#include "LC4Machine.h"
+﻿#include "ali.h"
+#include "LC4Machine.h"
 
 int main(int argc, char* argv[])
 {
-    LC4Machine lc4("test.bin");
-    return 0;
+    return ALI::begin(argc, argv);
 }
