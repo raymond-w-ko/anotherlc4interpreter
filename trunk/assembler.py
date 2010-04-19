@@ -38,11 +38,20 @@ def isInt(val):
   
   return ok
 
+def hexorint(q):
+  if isInt(q):
+    return int(q)
+  elif q[0:2] == "0x":
+    return int(q[2:],16)
+  else:
+    print q + " is not a number. WTF dude."
+    exit(0)
+
 def imm2bin(imm, numDigits, signed = 0):
   if signed == 0:
     if isInt(imm):
       if(imm < 0):
-        imm = 2**(numDigints + 1) - imm
+        imm = 2**(numDigits + 1) - imm
       
       imm = int2bin(imm, numDigits)
       return imm
@@ -93,12 +102,7 @@ def parse_branch(instruc = "", word_buf = ""):
   ins = ins_list[0]
   ins = ins.lower()
   imm = ins_list[1]
-  if isInt(imm):
-    imm = int(imm)
-  elif imm[0:2] == "0x":
-    imm = int(imm[2:], 16)
-  else:
-    print imm + " is not a number. WTF dude."
+  imm = hexorint(imm)
   if imm > (2**8) or imm < -(2**8) + 1:
     print "ERROR: Immediate value " + str(imm) +" is out of range."
     print "IMM in BR(nzp) IMM must be greater than -(2**8) + 1 and less than 2**8"
@@ -145,10 +149,10 @@ def parse_alu(instruc = "", word_buf = ""):
   word_buf += regS
   
   if ins == "add":
-    if isInt(regT):
+    if isInt(regT) or regT[0:2] == "0x":
+      imm = hexorint(regT)
       word_buf += "1"
-      regT = int(regT)
-      word_buf += int2bin(regT, 5)
+      word_buf += int2bin(imm, 5)
     else:
       word_buf += "000"
       word_buf += reg2bin(regT)
@@ -193,7 +197,7 @@ def parse_compare(instruc = "", word_buf = ""):
     word_buf += imm
   elif ins == "cmpiu":
     word_buf += "11"
-    imm = int(regT)
+    imm = hexorint(imm)
     imm = int2bin(imm, 7)
     word_buf += imm
   else:
@@ -213,7 +217,7 @@ def parse_jump(instruc = "", word_buf = ""):
   
   if ins == "jsr":
     word_buf += "1"
-    imm = int(regS)
+    imm = hexorint(imm)
     if imm > 2**10 or imm < -(2**10) + 1:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
       print "IMM in JSR IMM must be greater than -(2**10) + 1 and less than 2**10"
@@ -237,7 +241,7 @@ def parse_jump(instruc = "", word_buf = ""):
   
   elif ins == "jmp":
     word_buf += "1"
-    imm = int(regS)
+    imm = hexorint(imm)
     if imm > 2**10 or imm < -(2**10) + 1:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
       print "IMM in JMP IMM must be greater than -(2**10) + 1 and less than 2**10"
@@ -268,11 +272,11 @@ def parse_bool(instruc = "", word_buf = ""):
     regT = instruc[3]
   
   if ins == "and":
-    if regT.isInt():
+    if isInt(regT) or regT[0:2] == "0x":
       word_buf += reg2bin(regD)
       word_buf += reg2bin(regS)
       word_buf += "1"
-      imm = int(regT)
+      imm = hexorint(imm)
       if imm > 2**4 or imm < (-2**4 + 1):
         print "ERROR: Immediate value " + str(imm) +" is out of range."
         print "IMM in AND Dst, Src, IMM must be greater than -(2**4) + 1 and less than 2**4"
@@ -320,7 +324,7 @@ def parse_mem(instruc = "", word_buf = ""):
   regD = instruc[1]
   regS = instruc[2]
   imm = instruc[3]
-  imm = int(imm)
+  imm = hexorint(imm)
   if imm > 2**5 or imm < -(2**5) + 1:
     print "ERROR: Immediate value " + str(imm) +" is out of range."
     print "IMM in LDR/STR Dst, Src, IMM must be greater than -(2**5) + 1 and less than 2**5"
@@ -352,10 +356,15 @@ def parse_const(instruc = "", word_buf = ""):
   ins = instruc[0]
   regD = instruc[1]
   imm = instruc[2]
-  imm = int(imm)
-  
+  imm = hexorint(imm)
+  #imm = -15
   if ins == "const":
-    if imm > 2**8 or imm < -(2**8) + 1:
+    if imm > (2**8) or imm < (-(2**8) + 1):
+      print 2**8
+      print -2**8
+      print imm > 2**8
+      print imm < -(2**8) + 1
+      print imm
       print "ERROR: Immediate value " + str(imm) +" is out of range."
       print "IMM in CONST Dst, IMM must be greater than -(2**8) + 1 and less than 2**8"
       return "-1"
@@ -395,8 +404,8 @@ def parse_shift(instruc = "", word_buf = ""):
   regS = instruc[2]
   regT = instruc[3]
   imm = regT
-  if imm.isInt():
-    imm = int(imm)
+  if isInt(imm) or imm[0:2] == "0x":
+    imm = hexorint(imm)
     if imm > 2**4 or imm < 0:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
       print "IMM in SLL/SRA/SRL Dst, Src, UIMM must be greater than 0 and less than 2**4"
@@ -431,7 +440,7 @@ def parse_trap(instruc = "", word_buf = ""):
   instruc = sanitize(instruc)
   
   imm = instruc[1]
-  imm = int(imm)
+  imm = hexorint(imm)
   if imm > 2**8 or imm < 0:
     print "ERROR: Immediate value " + str(imm) +" is out of range."
     print "IMM in TRAP UIMM must be greater than 0 and less than 2**8"
