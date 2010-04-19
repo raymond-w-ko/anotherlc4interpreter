@@ -82,6 +82,12 @@ ALI::loop()
 bool
 ALI::parseCommand(char* str)
 {
+    static std::string lastCommand = "";
+
+    if (strlen(str) == 0) {
+        strcpy(str, lastCommand.c_str());
+    }
+
     if (strcmp(str, "quit") == 0 || strcmp(str, "q") == 0 || strcmp(str, "exit") == 0) {
         return false;
     }
@@ -98,7 +104,16 @@ ALI::parseCommand(char* str)
         if (!b) {
             this->commandLineMsg = "End of code reached. Please restart or exit.";
         }
+        else {
+            this->commandLineMsg = "";
+        }
     }
+    else if (strcmp(str, "r") == 0 || strcmp(str, "restart") == 0) {
+        this->lc4->init();
+        this->commandLineMsg = "LC4 Virtual Machine reinitialized.";
+    }
+
+    lastCommand = str;
 
     return true;
 }

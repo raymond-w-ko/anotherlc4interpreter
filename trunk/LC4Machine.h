@@ -33,6 +33,11 @@ public:
     LC4Machine(std::string filename);
 
     /**
+     * Used to initialize or reinitialize the machine
+     */
+    void init();
+
+    /**
      * Returns a copy of register values
      */
     LC4::registers get_registers() { return LC4::registers(regs); }
@@ -61,6 +66,9 @@ public:
         
 
 private:
+    /** Filename that contains binary code */
+    std::string filename;
+
     /** The state of the machine */
     LC4::registers regs;
 
