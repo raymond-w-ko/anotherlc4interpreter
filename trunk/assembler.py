@@ -25,10 +25,6 @@ def sanitize(instruc, type = 0):
   
   return instruc
 
-def int2bin(n, count=16):
-    #returns the binary of integer n, using count number of digits
-    return "".join([str((n >> y) & 1) for y in range(count-1, -1, -1)])
-
 def isInt(val):
   ok = 1
   try:
@@ -37,37 +33,19 @@ def isInt(val):
     ok = 0
   
   return ok
-
-def hexorint(q):
-  if isInt(q):
-    return int(q)
-  elif q[0:2] == "0x":
-    return int(q[2:],16)
-  else:
-    print q + " is not a number. WTF dude."
-    exit(0)
-
-def imm2bin(imm, numDigits, signed = 0):
-  if signed == 0:
-    if isInt(imm):
-      if(imm < 0):
-        imm = 2**(numDigits + 1) - imm
-      
-      imm = int2bin(imm, numDigits)
-      return imm
-    elif imm[0:2] == "0x":
-      imm = int(imm[2:], 16)
-      imm = imm2bin(imm, numDigits) 
-    else:
-      return "-1"
   
-    return imm
+def isHex(val):
+  return val[0:2] == "0x"
+
+def immToInt(imm):
+  if isHex(imm):
+    imm = int(imm[2:], 16)
+  elif isInt(imm):
+    imm = int(imm)
   else:
-    if imm[0:2] == "0x":
-      imm = int(imm[2:], 16)
-    
-    imm = imm2bin(imm, numDigits)
-    return imm
+    print "ERROR: " + imm + " is not a number. WTF Dude"
+  
+  return imm
 
 def reg2bin(register):
   register = register.lower()
@@ -92,6 +70,10 @@ def reg2bin(register):
     print "Thou shalt use registers r0, r1, r2, r3, r4, r5, r6, and r7"
     exit(0)
 
+def int2bin(n, count=16):
+    #returns the binary of integer n, using count number of digits
+    return "".join([str((n >> y) & 1) for y in range(count-1, -1, -1)])
+
 def parse_branch(instruc = "", word_buf = ""):
   if instruc == "" or word_buf == "":
     print "ERROR: someone accidentally the code in parse_branch"
@@ -102,13 +84,18 @@ def parse_branch(instruc = "", word_buf = ""):
   ins = ins_list[0]
   ins = ins.lower()
   imm = ins_list[1]
-  imm = hexorint(imm)
+  imm = immToInt(imm)
   if imm > (2**8) or imm < -(2**8) + 1:
     print "ERROR: Immediate value " + str(imm) +" is out of range."
     print "IMM in BR(nzp) IMM must be greater than -(2**8) + 1 and less than 2**8"
     return "-1"
   #get sign correct on the binary
-  imm = imm2bin(imm, 9)
+  sign = "0"
+  if(imm < 0):
+    imm = 2**10 - 2 + imm
+  
+  imm = int2bin(imm, 9)
+  
   
   if ins == "brn":
     word_buf = word_buf + "100"
@@ -149,10 +136,10 @@ def parse_alu(instruc = "", word_buf = ""):
   word_buf += regS
   
   if ins == "add":
-    if isInt(regT) or regT[0:2] == "0x":
-      imm = hexorint(regT)
+    if isInt(regT) or isHex(regT):
       word_buf += "1"
-      word_buf += int2bin(imm, 5)
+      regT = immToInt(regT)
+      word_buf += int2bin(regT, 5)
     else:
       word_buf += "000"
       word_buf += reg2bin(regT)
@@ -191,13 +178,17 @@ def parse_compare(instruc = "", word_buf = ""):
     word_buf += "01"
   elif ins == "cmpi":
     word_buf += "10"
-    imm = int(regT)
-    imm = imm2bin(imm)
+    imm = immToInt(regT)
+    if(imm < 0):
+      imm = 2**8 - 2 + imm
+      imm = int2bin(imm, 7)
+    else:
+      imm = int2bin(imm, 7)
     
     word_buf += imm
   elif ins == "cmpiu":
     word_buf += "11"
-    imm = hexorint(imm)
+    imm = int(regT)
     imm = int2bin(imm, 7)
     word_buf += imm
   else:
@@ -217,13 +208,17 @@ def parse_jump(instruc = "", word_buf = ""):
   
   if ins == "jsr":
     word_buf += "1"
-    imm = hexorint(imm)
+    imm = immToInt(regS)
     if imm > 2**10 or imm < -(2**10) + 1:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
       print "IMM in JSR IMM must be greater than -(2**10) + 1 and less than 2**10"
       return "-1"
     
-    imm = imm2bin(imm, 11)
+    if imm < 0:
+      imm = 2**12 - 2 + imm
+      imm = int2bin(imm, 11)
+    else:
+      imm = int2bin(imm, 11)
     
     word_buf += imm
     
@@ -241,13 +236,17 @@ def parse_jump(instruc = "", word_buf = ""):
   
   elif ins == "jmp":
     word_buf += "1"
-    imm = hexorint(imm)
+    imm = immToInt(regS)
     if imm > 2**10 or imm < -(2**10) + 1:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
       print "IMM in JMP IMM must be greater than -(2**10) + 1 and less than 2**10"
       return "-1"
     
-    imm = imm2bin(imm, 11)
+    if imm < 0:
+      imm = 2**12 - 2 + imm
+      imm = int2bin(imm, 11)
+    else:
+      imm = int2bin(imm, 11)
     
     word_buf += imm
     
@@ -272,17 +271,22 @@ def parse_bool(instruc = "", word_buf = ""):
     regT = instruc[3]
   
   if ins == "and":
-    if isInt(regT) or regT[0:2] == "0x":
+    if isInt(regT) or isHex(regT):
       word_buf += reg2bin(regD)
       word_buf += reg2bin(regS)
       word_buf += "1"
-      imm = hexorint(imm)
+      imm = immToInt(regT)
       if imm > 2**4 or imm < (-2**4 + 1):
         print "ERROR: Immediate value " + str(imm) +" is out of range."
         print "IMM in AND Dst, Src, IMM must be greater than -(2**4) + 1 and less than 2**4"
         return "-1"
       else:
-        imm = imm2bin(imm, 5)
+        if imm < 0:
+          imm = 2**6 - 2 + imm
+          imm = "1" + int2bin(imm, 5)
+        else:
+          imm = int2bin(imm, 5)
+        
         word_buf += imm
     else: #is a register
       word_buf += reg2bin(regD)
@@ -324,13 +328,17 @@ def parse_mem(instruc = "", word_buf = ""):
   regD = instruc[1]
   regS = instruc[2]
   imm = instruc[3]
-  imm = hexorint(imm)
+  imm = immToInt(imm)
   if imm > 2**5 or imm < -(2**5) + 1:
     print "ERROR: Immediate value " + str(imm) +" is out of range."
     print "IMM in LDR/STR Dst, Src, IMM must be greater than -(2**5) + 1 and less than 2**5"
     return "-1"
   
-  imm = imm2bin(imm, 6)
+  if imm < 0:
+    imm = 2**7 - 2 + imm  
+    imm = int2bin(imm, 6)
+  else:
+    imm = int2bin(imm, 6)
   
   if ins == "ldr":
     word_buf += "0"
@@ -356,20 +364,19 @@ def parse_const(instruc = "", word_buf = ""):
   ins = instruc[0]
   regD = instruc[1]
   imm = instruc[2]
-  imm = hexorint(imm)
-  #imm = -15
+  imm = immToInt(imm)
+  
   if ins == "const":
-    if imm > (2**8) or imm < (-(2**8) + 1):
-      print 2**8
-      print -2**8
-      print imm > 2**8
-      print imm < -(2**8) + 1
-      print imm
+    if imm > 2**8 or imm < -(2**8) + 1:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
       print "IMM in CONST Dst, IMM must be greater than -(2**8) + 1 and less than 2**8"
       return "-1"
     
-    imm = imm2bin(imm, 9)
+    if(imm < 0):
+      imm = 2**9 - 2 + imm
+      imm = int2bin(imm, 9)
+    else:
+      imm = int2bin(imm, 9)
     
     word_buf += "1001"
     word_buf += reg2bin(regD)
@@ -404,8 +411,8 @@ def parse_shift(instruc = "", word_buf = ""):
   regS = instruc[2]
   regT = instruc[3]
   imm = regT
-  if isInt(imm) or imm[0:2] == "0x":
-    imm = hexorint(imm)
+  if isInt(imm) or isHex(imm):
+    imm = immToInt(imm)
     if imm > 2**4 or imm < 0:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
       print "IMM in SLL/SRA/SRL Dst, Src, UIMM must be greater than 0 and less than 2**4"
@@ -440,7 +447,7 @@ def parse_trap(instruc = "", word_buf = ""):
   instruc = sanitize(instruc)
   
   imm = instruc[1]
-  imm = hexorint(imm)
+  imm = immToInt(imm)
   if imm > 2**8 or imm < 0:
     print "ERROR: Immediate value " + str(imm) +" is out of range."
     print "IMM in TRAP UIMM must be greater than 0 and less than 2**8"
@@ -540,9 +547,6 @@ def parse(instruc = ""):
     word_buf = parse_trap(instruc, word_buf)
     return word_buf
   
-  if ins == "OMGWTFBBQSAUCE":
-    return "dear god why"
-  
   print instruc + " is not a valid LC4 command"
   print "ERROR: Assembler error @ following instruction: " + instruc
   return "-1"
@@ -550,7 +554,11 @@ def parse(instruc = ""):
 def main():
   #get filename from commandline
   filename = ""
-  filename = sys.argv[1]
+  try:
+    filename = sys.argv[1]
+  except IOError:
+    print filename + " does not exist. Please don't make me try and open it."
+    sys.exit(0)
   
   if (filename == ""):
     print "Please provide a target file for the assembler to assemble"
@@ -562,12 +570,7 @@ def main():
   for line in file:
     binary = parse(line)
     if binary != "-1":
-      if binary == "dear god why":
-        i = 0
-        bin = array('H', [0])
-        while i < 1000:
-          bin.tofile(output_file)
-          i = i + 1
+      print binary
       B = int(binary[8:16],2)
       A = int(binary[0:8],2)
       binary = array('H', [A + B*256])
