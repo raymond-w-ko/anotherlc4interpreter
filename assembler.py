@@ -11,6 +11,20 @@ reg5 = "101"
 reg6 = "110"
 reg7 = "111"
 
+def sanitize(instruc, type = 0):
+  if type == 0:
+    instruc = instruc.replace(","," ")
+    instruc = instruc.lower()
+    instruc = instruc.split(" ") #instruc is now a list
+  
+  for element in instruc:
+    if element.find(" ") != -1:
+      element.replace(" ", "")
+    if element == "":
+      instruc.remove(element)
+  
+  return instruc
+
 def isInt(val):
   ok = 1
   try:
@@ -53,6 +67,7 @@ def parse_branch(instruc = "", word_buf = ""):
     return "-1"
   
   ins_list = instruc.split(" ")
+  ins_list = sanitize(ins_list)
   ins = ins_list[0]
   ins = ins.lower()
   imm = ins_list[1]
@@ -97,23 +112,12 @@ def parse_alu(instruc = "", word_buf = ""):
     print "ERROR: someone accidentally the code in parse_alu"
     return "-1"
   
-  instruc = instruc.replace(","," ")
-  instruc = instruc.lower()
-  instruc = instruc.split(" ") #instruc is now a list
-  for element in instruc:
-    if element.find(" ") != -1:
-      print "element " + element + "had whitespace... sanitizing"
-      element.replace(" ", "")
-      print "sanitized: element"
-    if element == "":
-      instruc.remove(element)
-  
+  instruc = sanitize(instruc)
   
   ins = instruc[0]
   regD = instruc[1]
   regS = instruc[2]
   regT = instruc[3]
-  
   regD = reg2bin(regD)
   regS = reg2bin(regS)
   word_buf += regD
@@ -149,9 +153,7 @@ def parse_compare(instruc = "", word_buf = ""):
     return "-1"
   
   blank = "0000"
-  instruc = instruc.replace(","," ")
-  instruc = instruc.lower()
-  instruc = instruc.split(" ") #instruc is now a list
+  instruc = sanitize(instruc)
   
   ins = instruc[0]
   regS = instruc[1]
@@ -187,9 +189,7 @@ def parse_jump(instruc = "", word_buf = ""):
     print "ERROR: someone accidentally the code in parse_jump"
     return "-1"
   
-  instruc = instruc.replace(","," ")
-  instruc = instruc.lower()
-  instruc = instruc.split(" ") #instruc is now a list
+  instruc = sanitize(instruc)
   
   ins = instruc[0]
   regS = instruc[1]
@@ -249,9 +249,7 @@ def parse_bool(instruc = "", word_buf = ""):
     print "ERROR: someone accidentally the code in parse_bool"
     return "-1"
   
-  instruc = instruc.replace(","," ")
-  instruc = instruc.lower()
-  instruc = instruc.split(" ") #instruc is now a list
+  instruc = sanitize(instruc)
   
   ins = instruc[0]
   regD = instruc[1]
@@ -312,9 +310,7 @@ def parse_mem(instruc = "", word_buf = ""):
     print "ERROR: someone accidentally the code in parse_mem"
     return "-1"
   
-  instruc = instruc.replace(","," ")
-  instruc = instruc.lower()
-  instruc = instruc.split(" ") #instruc is now a list
+  instruc = sanitize(instruc)
   
   ins = instruc[0]
   regD = instruc[1]
@@ -347,13 +343,11 @@ def parse_mem(instruc = "", word_buf = ""):
   return word_buf
 
 def parse_const(instruc = "", word_buf = ""):
-  if instruc == "" or word_buf == "":
+  if instruc == "":
     print "ERROR: someone accidentally the code in parse_const"
     return "-1"
   
-  instruc = instruc.replace(","," ")
-  instruc = instruc.lower()
-  instruc = instruc.split(" ") #instruc is now a list
+  instruc = sanitize(instruc)
   
   ins = instruc[0]
   regD = instruc[1]
@@ -370,7 +364,7 @@ def parse_const(instruc = "", word_buf = ""):
       imm *= -1
       imm = "1" + int2bin(imm, 8)
     else:
-      imm = int2bin(imm, )
+      imm = int2bin(imm, 9)
     
     word_buf += "1001"
     word_buf += reg2bin(regD)
@@ -398,9 +392,7 @@ def parse_shift(instruc = "", word_buf = ""):
     print "ERROR: someone accidentally the code in parse_shift"
     return "-1"
   
-  instruc = instruc.replace(","," ")
-  instruc = instruc.lower()
-  instruc = instruc.split(" ") #instruc is now a list
+  instruc = sanitize(instruc)
   
   ins = instruc[0]
   regD = instruc[1]
@@ -440,9 +432,7 @@ def parse_trap(instruc = "", word_buf = ""):
     print "ERROR: someone accidentally the code in parse_trap"
     return "-1"
   
-  instruc = instruc.replace(","," ")
-  instruc = instruc.lower()
-  instruc = instruc.split(" ") #instruc is now a list
+  instruc = sanitize(instruc)
   
   imm = instruc[1]
   imm = int(imm)
@@ -462,10 +452,11 @@ def parse(instruc = ""):
   if instruc.lower() == "ret":
     instruc = "jmpr r7"
   instruc_list = instruc.split(" ")
+  instruc_list = sanitize(instruc_list, 1)
+  
   word = instruc_list[0]
   #for word in instruc:
   ins = word.lower()
-  print "Working on instruction " + ins
   if ins == "nop":
     return "0000000000000000"
   
@@ -547,16 +538,14 @@ def parse(instruc = ""):
   print instruc + " is not a valid LC4 command"
   print "ERROR: Assembler error @ following instruction: " + instruc
   return "-1"
-	
-    
-      
+
 def main():
   #get filename from commandline
   filename = ""
   filename = sys.argv[1]
   
   if (filename == ""):
-    print "Please provide a filename for the assembler to assemble"
+    print "Please provide a target file for the assembler to assemble"
     sys.exit(0)
   
   file = open(filename, "r")
@@ -565,15 +554,10 @@ def main():
   for line in file:
     binary = parse(line)
     if binary != "-1":
-      print binary
-      B = int(binary[9:16],2)
-      print "***", binary[8:16]
+      B = int(binary[8:16],2)
       A = int(binary[0:8],2)
-      print "***", binary[0:8]
-      #binary = array('H', [A,B])
       binary = array('H', [A + B*256])
       binary.tofile(output_file)
-      #output_file.write("\n")
     else:
       print "An error has occurred. Please check the previous errors to determine where you went wrong, you bad, bad boy."
       output_file.truncate(0)
