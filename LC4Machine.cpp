@@ -8,6 +8,8 @@
 void
 LC4Machine::init()
 {
+    this->MEMCHECK = true;
+
     // Initialize all registers to 0x0
     memset(this->regs.r, 0, sizeof(this->regs.r));
 

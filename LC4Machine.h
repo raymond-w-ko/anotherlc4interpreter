@@ -72,16 +72,16 @@ private:
     /** The state of the machine */
     LC4::registers regs;
 
-    /** Memory of the machine */
-    // + 1 is necessary because 0xFFFF is also addressable
-    // 0xFFFF means only up to 0xFFFE is addressable
-    unsigned short memory[0xFFFF + 1];
     /**
      * This variables controls checks for OoB memory reads and writes
      * There is no reason to turn this off
      * maybe for performance reasons later?
      */
-    static const bool MEMCHECK = true;
+    unsigned int MEMCHECK;
+    /** Memory of the machine */
+    // + 1 is necessary because 0xFFFF is also addressable
+    // 0xFFFF means only up to 0xFFFE is addressable
+    unsigned short memory[0xFFFF + 1];
 
     /** location of end of instructions short */
     unsigned short end_of_instructions;
