@@ -335,7 +335,7 @@ def parse_mem(instruc = "", word_buf = ""):
     return "-1"
   
   if imm < 0:
-    imm = 2**7 - 2 + imm  
+    imm = 2**7 + imm  
     imm = int2bin(imm, 6)
   else:
     imm = int2bin(imm, 6)
