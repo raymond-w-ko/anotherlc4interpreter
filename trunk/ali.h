@@ -18,6 +18,7 @@ private:
     WINDOW* wMemory;
     WINDOW* wDisassembly;
     WINDOW* wCommandLine;
+    std::string commandLineMsg;
 
     void redraw();
     bool parseCommand(char* str);
