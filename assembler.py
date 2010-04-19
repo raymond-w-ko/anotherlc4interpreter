@@ -355,7 +355,7 @@ def parse_const(instruc = "", word_buf = ""):
   imm = int(imm)
   
   if ins == "const":
-    if imm > 2^8 or imm < -(2^8) + 1:
+    if imm > 2**8 or imm < -(2**8) + 1:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
       print "IMM in CONST Dst, IMM must be greater than -(2^8) + 1 and less than 2^8"
       return "-1"
