@@ -72,9 +72,9 @@ def parse_branch(instruc = "", word_buf = ""):
   ins = ins.lower()
   imm = ins_list[1]
   imm = int(imm)
-  if imm > (2^8) or imm < -(2^8) + 1:
+  if imm > (2**8) or imm < -(2**8) + 1:
     print "ERROR: Immediate value " + str(imm) +" is out of range."
-    print "IMM in BR(nzp) IMM must be greater than -(2^8) + 1 and less than 2^8"
+    print "IMM in BR(nzp) IMM must be greater than -(2**8) + 1 and less than 2**8"
     return "-1"
   #get sign correct on the binary
   sign = "0"
@@ -197,9 +197,9 @@ def parse_jump(instruc = "", word_buf = ""):
   if ins == "jsr":
     word_buf += "1"
     imm = int(regS)
-    if imm > 2^10 or imm < -(2^10) + 1:
+    if imm > 2**10 or imm < -(2**10) + 1:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
-      print "IMM in JSR IMM must be greater than -(2^10) + 1 and less than 2^10"
+      print "IMM in JSR IMM must be greater than -(2**10) + 1 and less than 2**10"
       return "-1"
     
     if imm < 0:
@@ -225,9 +225,9 @@ def parse_jump(instruc = "", word_buf = ""):
   elif ins == "jmp":
     word_buf += "1"
     imm = int(regS)
-    if imm > 2^10 or imm < -(2^10) + 1:
+    if imm > 2**10 or imm < -(2**10) + 1:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
-      print "IMM in JMP IMM must be greater than -(2^10) + 1 and less than 2^10"
+      print "IMM in JMP IMM must be greater than -(2**10) + 1 and less than 2**10"
       return "-1"
     
     if imm < 0:
@@ -264,9 +264,9 @@ def parse_bool(instruc = "", word_buf = ""):
       word_buf += reg2bin(regS)
       word_buf += "1"
       imm = int(regT)
-      if imm > 2^4 or imm < (-2^4 + 1):
+      if imm > 2**4 or imm < (-2**4 + 1):
         print "ERROR: Immediate value " + str(imm) +" is out of range."
-        print "IMM in AND Dst, Src, IMM must be greater than -(2^4) + 1 and less than 2^4"
+        print "IMM in AND Dst, Src, IMM must be greater than -(2**4) + 1 and less than 2**4"
         return "-1"
       else:
         if imm < 0:
@@ -317,9 +317,9 @@ def parse_mem(instruc = "", word_buf = ""):
   regS = instruc[2]
   imm = instruc[3]
   imm = int(imm)
-  if imm > 2^5 or imm < -(2^5) + 1:
+  if imm > 2**5 or imm < -(2**5) + 1:
     print "ERROR: Immediate value " + str(imm) +" is out of range."
-    print "IMM in LDR/STR Dst, Src, IMM must be greater than -(2^5) + 1 and less than 2^5"
+    print "IMM in LDR/STR Dst, Src, IMM must be greater than -(2**5) + 1 and less than 2**5"
     return "-1"
   
   if imm < 0:
@@ -357,7 +357,7 @@ def parse_const(instruc = "", word_buf = ""):
   if ins == "const":
     if imm > 2**8 or imm < -(2**8) + 1:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
-      print "IMM in CONST Dst, IMM must be greater than -(2^8) + 1 and less than 2^8"
+      print "IMM in CONST Dst, IMM must be greater than -(2**8) + 1 and less than 2**8"
       return "-1"
     
     if(imm < 0):
@@ -371,9 +371,9 @@ def parse_const(instruc = "", word_buf = ""):
     word_buf += imm
   
   elif ins == "hiconst":
-    if imm > 2^8 or imm < 0:
+    if imm > 2**8 or imm < 0:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
-      print "IMM in HICONST Dst UIMM must be greater than 0 and less than 2^8"
+      print "IMM in HICONST Dst UIMM must be greater than 0 and less than 2**8"
       return "-1"
     
     word_buf += "1101"
@@ -401,9 +401,9 @@ def parse_shift(instruc = "", word_buf = ""):
   imm = regT
   if imm.isInt():
     imm = int(imm)
-    if imm > 2^4 or imm < 0:
+    if imm > 2**4 or imm < 0:
       print "ERROR: Immediate value " + str(imm) +" is out of range."
-      print "IMM in SLL/SRA/SRL Dst, Src, UIMM must be greater than 0 and less than 2^4"
+      print "IMM in SLL/SRA/SRL Dst, Src, UIMM must be greater than 0 and less than 2**4"
       return "-1"
   
   word_buf += reg2bin(regD)
@@ -436,9 +436,9 @@ def parse_trap(instruc = "", word_buf = ""):
   
   imm = instruc[1]
   imm = int(imm)
-  if imm > 2^8 or imm < 0:
+  if imm > 2**8 or imm < 0:
     print "ERROR: Immediate value " + str(imm) +" is out of range."
-    print "IMM in TRAP UIMM must be greater than 0 and less than 2^8"
+    print "IMM in TRAP UIMM must be greater than 0 and less than 2**8"
     return "-1"
   
   word_buf += "0000"
