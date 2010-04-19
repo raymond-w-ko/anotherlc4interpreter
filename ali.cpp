@@ -50,6 +50,7 @@ ali_ctor_continue:
     this->wMemory = newwin(7, 69, 0, 11);
     this->wDisassembly = newwin(13, 69, 7, 11);
     this->wCommandLine = newwin(4, 69, 20, 11);
+    this->commandLineMsg = "";
 
     refresh();
     this->redraw();
@@ -93,7 +94,10 @@ ALI::parseCommand(char* str)
         this->memory_location = new_mem_loc;
     }
     else if (strcmp(str, "step") == 0 || strcmp(str, "s") == 0) {
-        this->lc4->step();
+        bool b = this->lc4->step();
+        if (!b) {
+            this->commandLineMsg = "End of code reached. Please restart or exit.";
+        }
     }
 
     return true;
@@ -170,6 +174,7 @@ ALI::redraw()
     // print command line region
     wclear(this->wCommandLine);
     box(this->wCommandLine, 0, 0);
+    mvwprintw(this->wCommandLine, 1, 1, this->commandLineMsg.c_str());
     mvwprintw(this->wCommandLine, 2, 1, "> ");
 
     // refresh windows
