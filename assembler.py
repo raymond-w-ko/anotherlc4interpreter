@@ -79,7 +79,7 @@ def parse_branch(instruc = "", word_buf = ""):
   #get sign correct on the binary
   sign = "0"
   if(imm < 0):
-    imm = 2**10 - 2 + imm
+    imm = 2**10 - imm
   
   imm = int2bin(imm, 9)
   
@@ -167,7 +167,7 @@ def parse_compare(instruc = "", word_buf = ""):
     word_buf += "10"
     imm = int(regT)
     if(imm < 0):
-      imm = 2**8 - 2 + imm
+      imm = 2**8 - imm
       imm = int2bin(imm, 7)
     else:
       imm = int2bin(imm, 7)
@@ -202,7 +202,7 @@ def parse_jump(instruc = "", word_buf = ""):
       return "-1"
     
     if imm < 0:
-      imm = 2**12 - 2 + imm
+      imm = 2**12 - imm
       imm = int2bin(imm, 11)
     else:
       imm = int2bin(imm, 11)
@@ -230,7 +230,7 @@ def parse_jump(instruc = "", word_buf = ""):
       return "-1"
     
     if imm < 0:
-      imm = 2**12 - 2 + imm
+      imm = 2**12 - imm
       imm = int2bin(imm, 11)
     else:
       imm = int2bin(imm, 11)
@@ -269,7 +269,7 @@ def parse_bool(instruc = "", word_buf = ""):
         return "-1"
       else:
         if imm < 0:
-          imm = 2**6 - 2 + imm
+          imm = 2**6 - imm
           imm = "1" + int2bin(imm, 5)
         else:
           imm = int2bin(imm, 5)
@@ -322,7 +322,7 @@ def parse_mem(instruc = "", word_buf = ""):
     return "-1"
   
   if imm < 0:
-    imm = 2**7 - 2 + imm  
+    imm = 2**7 - imm  
     imm = int2bin(imm, 6)
   else:
     imm = int2bin(imm, 6)
@@ -360,7 +360,7 @@ def parse_const(instruc = "", word_buf = ""):
       return "-1"
     
     if(imm < 0):
-      imm = 2**9 - 2 + imm
+      imm = 2**8 + imm
       imm = int2bin(imm, 9)
     else:
       imm = int2bin(imm, 9)
