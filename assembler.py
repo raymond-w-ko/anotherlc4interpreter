@@ -360,7 +360,7 @@ def parse_const(instruc = "", word_buf = ""):
       return "-1"
     
     if(imm < 0):
-      imm = 2**8 + imm
+      imm = 2**9 + imm
       imm = int2bin(imm, 9)
     else:
       imm = int2bin(imm, 9)
