@@ -4,7 +4,7 @@
 #include <cstring>
 #include <ncurses.h>
 
-ALI::ALI(LC4Machine* lc4, std::string src_filename)
+ALI::ALI(std::string src_filename)
 {
     if (src_filename.empty()) {
         this->NO_SOURCE_FILE = true;
@@ -33,7 +33,6 @@ ALI::ALI(LC4Machine* lc4, std::string src_filename)
 ali_ctor_continue:
 
     // store LC4Machine reference
-    this->lc4 = lc4;
     this->memory_location = 0;
 
     // initialized ncurses
@@ -52,11 +51,6 @@ ali_ctor_continue:
     this->wCommandLine = newwin(4, 69, 20, 11);
     this->commandLineMsg = "";
 
-    refresh();
-    this->redraw();
-    refresh();
-    this->redraw();
-    refresh();
 }
 
 ALI::~ALI()
@@ -109,6 +103,9 @@ ALI::parseCommand(char* str)
     else if (strcmp(str, "r") == 0 || strcmp(str, "restart") == 0) {
         this->lc4->init();
         this->commandLineMsg = "LC4 Virtual Machine reinitialized.";
+    }
+    else {
+        this->commandLineMsg = "Invalid command entered";
     }
 
     lastCommand = str;
@@ -179,8 +176,20 @@ ALI::redraw()
         catch(...) {
             insn_str = "---";
         }
-
-        mvwprintw(this->wDisassembly, row, 1, "%04x:\t%s", insn_ptr, insn_str.c_str());
+        unsigned short insn = this->lc4->get_mem(insn_ptr);
+        std::string binary = "";
+        std::string empty = "";
+        unsigned short mask = 1;
+        for (int ii = 0; ii < 16; ii++) {
+            if (mask & insn) {
+                binary = empty + "1" + binary;
+            }
+            else {
+                binary = empty + "0" + binary;
+            }
+            mask <<= 1;
+        }
+        mvwprintw(this->wDisassembly, row, 1, "%04x:\t%s    %s", insn_ptr, binary.c_str(), insn_str.c_str());
     }
 
     // print command line region
@@ -216,9 +225,10 @@ ALI::begin(int argc, char* argv[])
     }
 
     try {
+        ALI ali(src_file);
         LC4Machine lc4(bin_file);
-        ALI ali(&lc4, src_file);
         lc4.setManagedBy(&ali);
+        ali.setMachine(&lc4);
         ali.loop();
     }
     catch(const char* str) {

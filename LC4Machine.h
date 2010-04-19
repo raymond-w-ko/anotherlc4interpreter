@@ -77,6 +77,11 @@ private:
     /** The state of the machine */
     LC4::registers regs;
 
+    /** location of end of instructions short */
+    unsigned short end_of_instructions;
+
+    /** points to the beginning of the memory of the virtual machine */
+    unsigned short* memory;
     /**
      * This variables controls checks for OoB memory reads and writes
      * There is no reason to turn this off
@@ -84,12 +89,8 @@ private:
      */
     unsigned int MEMCHECK;
     /** Memory of the machine */
-    // + 1 is necessary because 0xFFFF is also addressable
-    // 0xFFFF means only up to 0xFFFE is addressable
-    unsigned short memory[0xFFFF + 1];
-
-    /** location of end of instructions short */
-    unsigned short end_of_instructions;
+    // Actual memory, this way we dynamically and easily change memory size
+    unsigned short mem[0xFFFF];
 
     /** given a value, updates the NZP appropriately */
     void update_NZP(unsigned short n);
@@ -148,19 +149,4 @@ private:
      * @returns the new value of PC
      */
     unsigned short perform_jmp(unsigned short op);
-
-        
-    /**
-     * Performs a Boolean instruction
-     * @param operation the opcode parsed from the instruction
-     * @param dst the destination register for storing the result of the op
-     * @param src the source register we will perform the operation on
-     * @param t the register we will manipulate in conjunction with src OR
-     *          the immediate value (as in and ADDI instruction)
-     * @return the result that was stored to dst (should be used for debug
-     *         purposes only)
-     */
-    unsigned int perform_BOOL(unsigned short operations, 
-                              short dst, short src, short t);
-        
 };

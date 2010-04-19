@@ -8,6 +8,7 @@
 void
 LC4Machine::init()
 {
+    this->memory = this->mem;
     this->MEMCHECK = true;
 
     // Initialize all registers to 0x0
@@ -63,7 +64,7 @@ bool
 LC4Machine::step()
 {
     // Check to see if we have reached end of instruction byte
-    if (this->regs.pc == this->end_of_instructions) {
+    if (this->regs.pc >= this->end_of_instructions) {
         return false;
     }
 
