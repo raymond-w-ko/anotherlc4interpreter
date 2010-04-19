@@ -2,12 +2,21 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
+#include <string>
 #include "LC4Machine.h"
 
 LC4Machine::LC4Machine(std::string filename)
 {
     // Initialize all registers to 0x0
     memset(this->regs.r, 0, sizeof(this->regs.r));
+    this->regs.r[0] = 1;
+    this->regs.r[1] = 2;
+    this->regs.r[2] = 3;
+    this->regs.r[3] = 4;
+    this->regs.r[4] = 5;
+    this->regs.r[5] = 6;
+    this->regs.r[6] = 7;
+    this->regs.r[7] = 8;
 
     this->regs.pc = 0x0000;
 
@@ -22,6 +31,9 @@ LC4Machine::LC4Machine(std::string filename)
     memset(this->memory, 0, sizeof(this->memory));
 
     std::ifstream in(filename.c_str(), std::ios::in | std::ios::binary);
+    if (in.fail()) {
+        throw "BIN file does not exist!";
+    }
 
     // Load instructions into memory space starting at 0x0;
     if (filename.empty()) {
@@ -41,10 +53,6 @@ LC4Machine::LC4Machine(std::string filename)
         }
     }
     this->end_of_instructions = counter;
-
-    for (unsigned int ii = 0; ii <= 0xFFFF; ii++) {
-        //printf ("%04x:\t%04x\n", ii, this->memory[ii]);
-    }
 
     in.close();
 }

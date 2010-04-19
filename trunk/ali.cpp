@@ -1,10 +1,37 @@
 #include "LC4Machine.h"
 #include "ali.h"
+#include <cstdlib>
 #include <cstring>
 #include <ncurses.h>
 
-ALI::ALI(LC4Machine* lc4)
+ALI::ALI(LC4Machine* lc4, std::string src_filename)
 {
+    if (src_filename.empty()) {
+        this->NO_SOURCE_FILE = true;
+    }
+    else {
+        this->NO_SOURCE_FILE = false;
+        std::ifstream in(src_filename.c_str(), std::ios::in);
+        if (in.fail()) {
+            std::cout << "BIN file does not exist!";
+            in.close();
+            goto ali_ctor_continue;
+        }
+
+        while (in.good()) {
+            std::string s;
+            std::getline(in, s);
+            if (!in.eof()) {
+                this->code.push_back(s);
+            }
+        }
+
+        in.close();
+
+    }
+
+ali_ctor_continue:
+
     // store LC4Machine reference
     this->lc4 = lc4;
     this->memory_location = 0;
@@ -19,12 +46,16 @@ ALI::ALI(LC4Machine* lc4)
     //keypad(stdscr, TRUE);
 
     // initialize windows
-    this->wRegisters = newwin(25, 11, 0, 0);
+    this->wRegisters = newwin(24, 11, 0, 0);
     this->wMemory = newwin(7, 69, 0, 11);
-    this->wCommandLine = newwin(18, 69, 7, 11);
+    this->wDisassembly = newwin(13, 69, 7, 11);
+    this->wCommandLine = newwin(4, 69, 20, 11);
 
     refresh();
     this->redraw();
+    refresh();
+    this->redraw();
+    refresh();
 }
 
 ALI::~ALI()
@@ -39,20 +70,42 @@ ALI::loop()
 {
     while (1) {
         char str[1000];
-        wgetstr(this->wCommandLine, str);
-        this->redraw();
-        if (strcmp(str, "quit") == 0) {
+        wgetnstr(this->wCommandLine, str, 1000);
+        if (!this->parseCommand(str)) {
             break;
         }
+        this->redraw();
     }
+}
+
+bool
+ALI::parseCommand(char* str)
+{
+    if (strcmp(str, "quit") == 0 || strcmp(str, "q") == 0 || strcmp(str, "exit") == 0) {
+        return false;
+    }
+    else if (strstr(str, "mem") == str) {
+        // Make sure there is at least a number after the mem command
+        if (strlen(str) < 5) {
+            return true;
+        }
+        unsigned new_mem_loc = strtol(&str[4], NULL, 16);
+        this->memory_location = new_mem_loc;
+    }
+    else if (strcmp(str, "step") == 0 || strcmp(str, "s") == 0) {
+        this->lc4->step();
+    }
+
+    return true;
 }
 
 void
 ALI::redraw()
 {
+    LC4::registers regs(this->lc4->get_registers());
+
     // output registers
     box(this->wRegisters, 0, 0);
-    LC4::registers regs(this->lc4->get_registers());
     mvwprintw(this->wRegisters, 1, 1, " R0=%04x", regs.r[0]);
     mvwprintw(this->wRegisters, 2, 1, " R1=%04x", regs.r[1]);
     mvwprintw(this->wRegisters, 3, 1, " R2=%04x", regs.r[2]);
@@ -97,32 +150,67 @@ ALI::redraw()
         loc += 12;
     }
 
+
+    // print disassembly
+    wclear(this->wDisassembly);
+    box(this->wDisassembly, 0, 0);
+    for (int row = 1; row <= 11; row++) {
+        unsigned short insn_ptr = regs.pc + row - 1;
+        std::string insn_str;
+        try {
+            insn_str = this->code.at(insn_ptr);
+        }
+        catch(...) {
+            insn_str = "---";
+        }
+
+        mvwprintw(this->wDisassembly, row, 1, "%04x:\t%s", insn_ptr, insn_str.c_str());
+    }
+
     // print command line region
     wclear(this->wCommandLine);
     box(this->wCommandLine, 0, 0);
-    mvwprintw(this->wCommandLine, 16, 1, "> ");
+    mvwprintw(this->wCommandLine, 2, 1, "> ");
 
     // refresh windows
     wrefresh(wRegisters);
     wrefresh(wMemory);
     wrefresh(wCommandLine);
+    wrefresh(wDisassembly);
 
     // position cursor to correct location
-    wmove(this->wCommandLine, 16, 3);
+    wmove(this->wCommandLine, 2, 3);
 
     refresh();
 }
 
 int main(int argc, char* argv[])
 {
-    LC4Machine lc4("test.bin");
-    ALI ali(&lc4);
+    if (argc <= 1 || argc > 3) {
+        printf("%s [bin file] (optional source file)\n", argv[0]);
+        return 1;
+    }
 
-    ali.loop();
+    std::string bin_file = argv[1];
+    std::string src_file = "";
+    if (argc == 3) {
+        src_file = argv[2];
+    }
 
-    /*
-    mvwprintw(reg_windows, 1, 1, "R1=%08x", regs.r[0]);
-    */
+    try {
+        LC4Machine lc4(bin_file);
+        ALI ali(&lc4, src_file);
+        ali.loop();
+    }
+    catch(const char* str) {
+        std::cout << str << std::endl;
+        return 1;
+    }
+    catch(...) {
+        std::cout << "Uncaught exception" << std::endl;
+        return 255;
+    }
+
 
     return 0;
 }

@@ -570,7 +570,8 @@ def main():
       print "***", binary[8:16]
       A = int(binary[0:8],2)
       print "***", binary[0:8]
-      binary = array('H', [A,B])
+      #binary = array('H', [A,B])
+      binary = array('H', [A + B*256])
       binary.tofile(output_file)
       #output_file.write("\n")
     else:
