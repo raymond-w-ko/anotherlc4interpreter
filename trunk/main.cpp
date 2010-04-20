@@ -1,4 +1,4 @@
-﻿#include "ali.h"
+#include "ali.h"
 #include "LC4Machine.h"
 
 int main(int argc, char* argv[])
