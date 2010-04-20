@@ -89,7 +89,7 @@ def parse_branch(instruc = "", word_buf = ""):
     return "-1"
   
   if(imm < 0):
-    imm = 2**10 - 2 + imm
+    imm = 2**10 + imm
   
   imm = int2bin(imm, 9)
   

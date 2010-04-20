@@ -27,6 +27,7 @@ namespace LC4
 class ALI;
 class LC4Machine
 {
+friend class ALI;
 public:
     /**
      * Constructor for an LC4 virtual machine that takes
@@ -80,8 +81,6 @@ private:
     /** location of end of instructions short */
     unsigned short end_of_instructions;
 
-    /** points to the beginning of the memory of the virtual machine */
-    unsigned short* memory;
     /**
      * This variables controls checks for OoB memory reads and writes
      * There is no reason to turn this off
@@ -90,7 +89,9 @@ private:
     unsigned int MEMCHECK;
     /** Memory of the machine */
     // Actual memory, this way we dynamically and easily change memory size
-    unsigned short mem[0xFFFF];
+    unsigned short mem[0xFFFF + 1];
+    /** points to the beginning of the memory of the virtual machine */
+    unsigned short* memory;
 
     /** given a value, updates the NZP appropriately */
     void update_NZP(unsigned short n);

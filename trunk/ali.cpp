@@ -90,14 +90,39 @@ ALI::parseCommand(char* str)
         if (strlen(str) < 5) {
             return true;
         }
-        unsigned new_mem_loc = strtol(&str[4], NULL, 16);
+        unsigned short new_mem_loc = strtol(&str[4], NULL, 16);
         this->memory_location = new_mem_loc;
+        char buf[1000];
+        sprintf(buf, "Reading VM memory address 0x%04x from address %p", new_mem_loc, &this->lc4->memory[new_mem_loc]);
+        this->commandLineMsg = std::string("") + buf;
     }
     else if (strcmp(str, "step") == 0 || strcmp(str, "s") == 0) {
         this->commandLineMsg = "";
         bool b = this->lc4->step();
         if (!b) {
             this->commandLineMsg = "End of code reached. Please restart or exit.";
+        }
+    }
+    else if (strstr(str, "step ") == str)  {
+        this->commandLineMsg = "";
+        unsigned int steps = strtol(&str[5], NULL, 16);
+        for (unsigned int ii = 0; ii < steps; ii++) {
+            bool b = this->lc4->step();
+            if (!b) {
+                this->commandLineMsg = "End of code reached. Please restart or exit.";
+                break;
+            }
+        }
+    }
+    else if (strstr(str, "s ") == str) {
+        this->commandLineMsg = "";
+        unsigned int steps = strtol(&str[2], NULL, 16);
+        for (unsigned int ii = 0; ii < steps; ii++) {
+            bool b = this->lc4->step();
+            if (!b) {
+                this->commandLineMsg = "End of code reached. Please restart or exit.";
+                break;
+            }
         }
     }
     else if (strcmp(str, "r") == 0 || strcmp(str, "restart") == 0) {
@@ -225,8 +250,8 @@ ALI::begin(int argc, char* argv[])
     }
 
     try {
-        ALI ali(src_file);
         LC4Machine lc4(bin_file);
+        ALI ali(src_file);
         lc4.setManagedBy(&ali);
         ali.setMachine(&lc4);
         ali.loop();
