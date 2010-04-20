@@ -171,8 +171,10 @@ def parse_compare(instruc = "", word_buf = ""):
   word_buf += reg2bin(regS)
   if ins == "cmp":
     word_buf += "000000"
+    word_buf += reg2bin(regT)
   elif ins == "cmpu":
     word_buf += "010000"
+    word_buf += reg2bin(regT)
   elif ins == "cmpi":
     word_buf += "10"
     imm = immToInt(regT)
