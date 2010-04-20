@@ -79,18 +79,15 @@ def parse_branch(instruc = "", word_buf = ""):
     print "ERROR: someone accidentally the code in parse_branch"
     return "-1"
   
-  ins_list = instruc.split(" ")
-  ins_list = sanitize(ins_list)
+  ins_list = sanitize(instruc)
   ins = ins_list[0]
-  ins = ins.lower()
   imm = ins_list[1]
   imm = immToInt(imm)
   if imm > (2**8) or imm < -(2**8) + 1:
     print "ERROR: Immediate value " + str(imm) +" is out of range."
     print "IMM in BR(nzp) IMM must be greater than -(2**8) + 1 and less than 2**8"
     return "-1"
-  #get sign correct on the binary
-  sign = "0"
+  
   if(imm < 0):
     imm = 2**10 - 2 + imm
   
@@ -117,8 +114,8 @@ def parse_branch(instruc = "", word_buf = ""):
     return "-1"
   
   return word_buf + imm
-  
-  
+
+
 def parse_alu(instruc = "", word_buf = ""):
   if instruc == "" or word_buf == "":
     print "ERROR: someone accidentally the code in parse_alu"
@@ -173,9 +170,9 @@ def parse_compare(instruc = "", word_buf = ""):
   
   word_buf += reg2bin(regS)
   if ins == "cmp":
-    word_buf += "00"
+    word_buf += "000000"
   elif ins == "cmpu":
-    word_buf += "01"
+    word_buf += "010000"
   elif ins == "cmpi":
     word_buf += "10"
     imm = immToInt(regT)
