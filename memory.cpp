@@ -27,6 +27,8 @@ LC4Machine::perform_load(unsigned short op)
     ptr += offset;
     this->regs.r[d] = *((unsigned short*) ptr);
 
+    this->update_NZP(this->regs.r[d]);
+
     return true;
 }
 
