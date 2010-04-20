@@ -24,7 +24,7 @@ LC4Machine::init()
     this->regs.p = false;
 
     // Initialize memory to 0
-    memset(this->memory, 0, sizeof(this->memory));
+    memset(this->memory, 0, sizeof(this->mem));
 
     std::ifstream in(filename.c_str(), std::ios::in | std::ios::binary);
     if (in.fail()) {

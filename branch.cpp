@@ -4,7 +4,7 @@ unsigned short
 LC4Machine::perform_branch(unsigned short op)
 {
     short I = (short) SEXT(extract(op, 0, 8), 9);
-    unsigned short oper_type = extract(op, 10, 12);
+    unsigned short oper_type = extract(op, 9, 11);
     switch(oper_type) {
     case 0:     // NOP
         break;
