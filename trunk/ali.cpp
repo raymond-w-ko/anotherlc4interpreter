@@ -21,7 +21,7 @@ ALI::ALI(std::string src_filename)
         while (in.good()) {
             std::string s;
             std::getline(in, s);
-            if (!in.eof()) {
+            if (!s.empty()) {
                 this->code.push_back(s);
             }
         }
