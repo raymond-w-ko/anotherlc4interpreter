@@ -104,6 +104,9 @@ ALI::parseCommand(char* str)
         }
     }
     else if (strstr(str, "step ") == str)  {
+        if (strlen(str) < 6) {
+            return true;
+        }
         this->commandLineMsg = "";
         unsigned int steps = strtol(&str[5], NULL, 16);
         for (unsigned int ii = 0; ii < steps; ii++) {
@@ -115,6 +118,9 @@ ALI::parseCommand(char* str)
         }
     }
     else if (strstr(str, "s ") == str) {
+        if (strlen(str) < 3) {
+            return true;
+        }
         this->commandLineMsg = "";
         unsigned int steps = strtol(&str[2], NULL, 16);
         for (unsigned int ii = 0; ii < steps; ii++) {
