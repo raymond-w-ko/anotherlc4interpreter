@@ -1,0 +1,96 @@
+Another LC4 Interpreter
+
+Foreword:
+  Welcome to the readme for Another LC4 Interpreter (ali)!
+  We hope you enjoy our program and are productive in all endeavours.
+
+About:
+  ali is a combination of an assembler (assembler.py) and LC4 virtual machine
+  (ali) made to assemble and run LC4 assembly.
+  ali was written by Raymond W. Ko and Alex Laties in 2010.
+  ali has only been tested on the SpecLab cluster at SEAS @ UPenn. It is not
+  designed for any other systems, nor tested. If you wish to run it on your
+  own machine, we are not responsible for any unintended behaviors exhibitted
+  by ali. You have been warned.
+  
+About LC4:
+  LC4 is an assembly language designed to help introduce assembly to students.
+  Features include realistic Intel-like syntax and behavior of instructions.
+  LC4's memory space is word addressable, where each word is 2 bytes, as 
+  opposed to byte addressable. This means that when loading data from LC4
+  memory, 16-bits of data are fetched per address. 
+  
+  For what instructions are available in LC4, please refer to the included
+  LC4.pdf file. Please note that ali does not currently support the following:
+  Pseudo-instructions, Assembly directives, Labelling.
+
+Requirements:
+  ali requires GNU C++ Compiler (g++) version 4.3.2 minimum and libncurses
+  to compile.
+  assembler.py requires the Python 2.6 runtime minimum
+
+Features:
+  -An awesome ncurses interface for easy use from the commandline
+  -gdb-like cli
+  -Side-by-side, step-by-step binary and LC4 assembly execution (Experimental:
+   the LC4 assembly is merely loaded from the provided source file. It's
+   possible to load a source file that is different from the binary. It will
+   not affect the execution of the binary. It will look rather confusing 
+   though.)
+  -Memory bounds check to prevent silly errors of writing to out of bounds 
+   addresses
+  -Use of goto's, reinterpret_cast's, and all other kinds of parts of C++ that
+   you didn't know about!
+  
+To Compile:
+  For ali:
+    Simply type make!
+  For assembler.py:
+    bash -e ':(){:|:}:'
+
+To Run:
+  To assemble a file:
+    python assembler.py nameoffile
+  To run an assembled file:
+    ali nameofassembledfile nameoffile
+    
+How to use ali:
+  After launching ali, you will be presented with an ncurses interface:
+  _________________________________________________________________________
+  | R0 = 0000 || 0000:                                                     |
+  | R1 = 0000 || 000c:                                                     |
+  | R2 = 0000 || 0018:      LC4 MEMORY WINDOW                              |
+  | R3 = 0000 || 0024:                                                     |
+  | R4 = 0000 || 0030:                                                     |
+  | R5 = 0000 ||___________________________________________________________|
+  | R6 = 0000 | ___________________________________________________________
+  | R7 = 0000 ||INTRUC_NO: INSTRUC_BIT  (optional)INSTRUCTION              |
+  |           ||                                                           |
+  | PC = 0000 ||                                                           |
+  |           ||                                                           |
+  |MPR = 0000 ||                                                           |
+  |PSR = 0000 ||                                                           |
+  |           ||                                                           |
+  |   N=0     ||                                                           |
+  |   Z=0     ||                                                           |
+  |   P=0     ||                                                           |
+  | REGISTERS ||___________________________________________________________|
+  |           | ___________________________________________________________
+  |           ||> PROMPT                                                   |       |
+  |___________||___________________________________________________________|
+
+  ali displays the instructions loaded by displaying instruction number, its
+  bitwise interpretation (INSTRUC_BIT), and if the source file was loaded as
+  well, the actual LC4 instruction.
+  
+  ali's prompt has the following commands (() denotes alias) that can be 
+  entered into PROMPT:
+    (s)tep [x] - steps through x number of steps, where x is a 32-bit hex 
+                 value (i.e. 0f00, ffa3). if no x is provided, steps by one.
+    mem x - sets the current LC4 memory window to specified address, where x
+            is a 16-bit hex value. acceptable values for x are 0000 through
+            ffff.
+    (r)estart - restarts the LC4 machine with the same instructions as was 
+                previously loaded
+    (q)uit - exits the program
+    exit - see (q)uit
